@@ -20,7 +20,6 @@ import {
   type Density,
   type GlassPreset,
   type MaterialKey,
-  GLASS_PRESETS,
   MATERIAL_RANGE,
   type Motion,
 } from "@/components/nexus/appearance-provider";
@@ -297,9 +296,6 @@ function GlassMaterialSection() {
             ? "Custom"
             : (glassPresets.find((option) => option.value === preset)?.label ?? "Balanced Glass")}
         </span>
-        {preset === "custom"
-          ? ` (based on ${Object.keys(GLASS_PRESETS).length} presets)`
-          : ""}
       </p>
     </GlassPanel>
   );
