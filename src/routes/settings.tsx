@@ -5,6 +5,7 @@ import {
   Laptop,
   Monitor,
   Moon,
+  Layers,
   Palette,
   Shield,
   Smartphone,
@@ -17,7 +18,10 @@ import {
   useAppearance,
   type Accent,
   type Density,
-  type GlassLevel,
+  type GlassPreset,
+  type MaterialKey,
+  GLASS_PRESETS,
+  MATERIAL_RANGE,
   type Motion,
 } from "@/components/nexus/appearance-provider";
 import { GlassPanel, IconTile, PageHeader, SectionTitle } from "@/components/nexus/glass";
@@ -27,6 +31,7 @@ import { useTheme, type ThemePreference } from "@/components/nexus/theme-provide
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
@@ -70,10 +75,22 @@ const accents: { value: Accent; label: string; swatch: string }[] = [
   { value: "rose", label: "Rose", swatch: "bg-rose" },
 ];
 
-const glassOptions: { value: GlassLevel; label: string }[] = [
-  { value: "low", label: "Solid" },
-  { value: "medium", label: "Balanced" },
-  { value: "high", label: "Airy" },
+const glassPresets: { value: GlassPreset; label: string; hint: string }[] = [
+  { value: "subtle", label: "Subtle Glass", hint: "Denser panes, gentle blur" },
+  { value: "balanced", label: "Balanced Glass", hint: "The Nexus default material" },
+  { value: "crystal", label: "Crystal Glass", hint: "Clearer panes, brighter edges" },
+  { value: "ultra", label: "Ultra Glass", hint: "Maximum see-through, deep blur" },
+];
+
+const materialControls: { key: MaterialKey; label: string; hint: string }[] = [
+  { key: "opacity", label: "Glass opacity", hint: "Density of the pane tint" },
+  { key: "blur", label: "Background blur", hint: "How far the backdrop diffuses" },
+  { key: "border", label: "Border intensity", hint: "Weight of edges and hairlines" },
+  { key: "brightness", label: "Surface brightness", hint: "Lightness of the pane tint" },
+  { key: "depth", label: "Depth / shadow", hint: "Ambient shadow spread" },
+  { key: "ambient", label: "Ambient lighting", hint: "Background glow bleeding through" },
+  { key: "saturation", label: "Glass saturation", hint: "Colour richness of the backdrop" },
+  { key: "reflection", label: "Reflection / highlight", hint: "Internal sheen and edge light" },
 ];
 
 const densityOptions: { value: Density; label: string }[] = [
@@ -192,10 +209,106 @@ function ToggleRow({
   );
 }
 
+function GlassMaterialSection() {
+  const { preset, material, setMaterial, applyPreset } = useAppearance();
+
+  return (
+    <GlassPanel strong className="@container p-6">
+      <SectionTitle
+        title="Glass / Material"
+        action={
+          <Button
+            variant="ghost"
+            size="sm"
+            className="rounded-lg text-xs text-muted-foreground"
+            onClick={() => {
+              applyPreset("balanced");
+              toast("Material reset to Balanced Glass");
+            }}
+          >
+            Reset
+          </Button>
+        }
+      />
+      <p className="mt-1 text-sm text-muted-foreground">
+        Tune the physical qualities of every Nexus surface. Changes apply live across the whole
+        interface, in both dark and light.
+      </p>
+
+      <div className="mt-5 grid gap-3 @sm:grid-cols-2 @xl:grid-cols-4">
+        {glassPresets.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={preset === option.value}
+            onClick={() => {
+              applyPreset(option.value);
+              toast(`${option.label} applied`);
+            }}
+            className={cn(
+              "glass glass-hover relative flex flex-col items-start gap-1 rounded-2xl p-4 text-left",
+              preset === option.value &&
+                "border-glass-highlight bg-glass-strong shadow-[var(--shadow-float)]",
+            )}
+          >
+            <span className="flex w-full items-center justify-between gap-2">
+              <IconTile tone={preset === option.value ? "violet" : "azure"} className="h-8 w-8">
+                <Layers className="h-4 w-4" />
+              </IconTile>
+              {preset === option.value ? <Check className="h-4 w-4 text-violet" /> : null}
+            </span>
+            <span className="mt-2 block text-sm font-medium">{option.label}</span>
+            <span className="block text-xs text-muted-foreground">{option.hint}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-6 grid gap-x-8 gap-y-5 border-t border-hairline pt-6 @xl:grid-cols-2">
+        {materialControls.map((control) => {
+          const range = MATERIAL_RANGE[control.key];
+          const value = material[control.key];
+          return (
+            <div key={control.key} className="min-w-0">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-sm font-medium">{control.label}</p>
+                <span className="tabular-nums text-xs text-muted-foreground">
+                  {Math.round(value * 100)}%
+                </span>
+              </div>
+              <p className="mt-0.5 text-xs text-muted-foreground">{control.hint}</p>
+              <Slider
+                className="mt-3"
+                aria-label={control.label}
+                min={range.min}
+                max={range.max}
+                step={range.step}
+                value={[value]}
+                onValueChange={([next]) => setMaterial(control.key, next ?? value)}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="mt-5 text-xs text-muted-foreground">
+        Current material:{" "}
+        <span className="text-foreground">
+          {preset === "custom"
+            ? "Custom"
+            : (glassPresets.find((option) => option.value === preset)?.label ?? "Balanced Glass")}
+        </span>
+        {preset === "custom"
+          ? ` (based on ${Object.keys(GLASS_PRESETS).length} presets)`
+          : ""}
+      </p>
+    </GlassPanel>
+  );
+}
+
 function SettingsPage() {
   const { preference, setPreference } = useTheme();
   const { preview, setPreview } = useLayoutPreview();
-  const { accent, glass, density, motion, set, reset } = useAppearance();
+  const { accent, density, motion, set, reset } = useAppearance();
 
 
 
@@ -310,14 +423,6 @@ function SettingsPage() {
               </div>
 
               <SegmentedRow
-                title="Glass intensity"
-                hint="How much of the background shows through surfaces."
-                value={glass}
-                options={glassOptions}
-                onChange={(value) => set("glass", value)}
-              />
-
-              <SegmentedRow
                 title="Density"
                 hint="Overall scale of spacing, radius and type."
                 value={density}
@@ -334,6 +439,8 @@ function SettingsPage() {
               />
             </div>
           </GlassPanel>
+
+          <GlassMaterialSection />
 
         </TabsContent>
 
