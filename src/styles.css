@@ -114,30 +114,45 @@
   --amber: oklch(0.79 0.14 78);
   --rose: oklch(0.7 0.15 12);
 
-  --glass-bg: oklch(0.99 0.01 280 / 5.5%);
-  --glass-bg-strong: oklch(0.99 0.01 280 / 9%);
-  --glass-border: oklch(1 0 0 / 10%);
-  --glass-highlight: oklch(1 0 0 / 16%);
-  --glass-sheen: oklch(1 0 0 / 6%);
-  --glass-ring: oklch(1 0 0 / 4%);
-  --hairline: oklch(1 0 0 / 7%);
-  --glass-blur: 22px;
-  --glass-saturate: 150%;
+  /* ---- Material knobs: unitless multipliers, live-controlled (default 1) ---- */
+  --g-opacity: 1;
+  --g-blur: 1;
+  --g-border: 1;
+  --g-brightness: 1;
+  --g-depth: 1;
+  --g-ambient: 1;
+  --g-saturation: 1;
+  --g-reflection: 1;
 
-  --shadow-glass: 0 1px 0 0 var(--glass-highlight) inset,
-    0 0 0 1px var(--glass-ring) inset, 0 18px 40px -24px oklch(0.05 0.02 270 / 75%),
-    0 2px 10px -6px oklch(0.05 0.02 270 / 60%);
-  --shadow-float: 0 1px 0 0 var(--glass-highlight) inset, 0 0 0 1px var(--glass-ring) inset,
-    0 32px 70px -28px oklch(0.04 0.02 270 / 85%);
+  /* ---- Dark material bases (cinematic, near-invisible tint) ---- */
+  --gm-tint-dim: oklch(0.52 0.035 278);
+  --gm-tint-bright: oklch(1 0.014 286);
+  --gm-alpha: 4;
+  --gm-alpha-strong: 6.5;
+  --gm-blur: 26;
+  --gm-sat: 150;
+  --gm-border-color: oklch(1 0 0);
+  --gm-border-alpha: 10;
+  --gm-highlight-alpha: 17;
+  --gm-sheen-alpha: 6;
+  --gm-ring-alpha: 5;
+  --gm-hairline-alpha: 7;
+  --gm-shadow: oklch(0.04 0.02 270);
+  --gm-shadow-a1: 68;
+  --gm-shadow-a2: 52;
+  --gm-shadow-a3: 80;
+  --gm-diffuse: oklch(0.72 0.16 288);
+  --gm-diffuse-alpha: 9;
+
   --gradient-brand: linear-gradient(135deg, oklch(0.72 0.14 292), oklch(0.6 0.17 275));
   --gradient-veil: radial-gradient(
     120% 90% at 85% -10%,
     oklch(0.6 0.13 285 / 22%),
     transparent 60%
   );
-  --atmosphere-opacity: 0.85;
+  --atmosphere-opacity-base: 0.85;
   --atmosphere-filter: none;
-  --veil-inner-opacity: 0.5;
+  --veil-inner-opacity-base: 0.5;
 }
 
 .light {
