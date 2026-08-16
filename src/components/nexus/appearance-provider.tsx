@@ -85,7 +85,7 @@ export type Appearance = {
   accent: Accent;
   density: Density;
   motion: Motion;
-  preset: GlassPreset;
+  preset: GlassPreset | "custom";
   material: Material;
 };
 
@@ -173,7 +173,7 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
       setAppearance((current) =>
         commit({
           ...current,
-          preset: "custom" as never extends never ? GlassPreset : GlassPreset,
+          preset: "custom",
           material: { ...current.material, [key]: value },
         }),
       ),
